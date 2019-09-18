@@ -27,11 +27,7 @@ public class ProductsCheapestSelector {
                 if (argumentCheckThreadNumber(args)){
                     productsList.setThreadNumber(Integer.parseInt(args[1]));
                 }
-                productsList.setRowLimit(3);
                 productsList.parseFileToList(args[0], productsParser);
-
-
-
                 printResult(productsList.getCheapestProducts());
 
             } catch (Exception e) {

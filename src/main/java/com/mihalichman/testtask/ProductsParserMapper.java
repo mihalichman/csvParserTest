@@ -34,6 +34,9 @@ public class ProductsParserMapper implements ProductsParser{
                 }
             }
 
+
+            System.out.println("");
+
             this.productList = products;
         } catch (IOException e) {
             e.printStackTrace();

@@ -7,17 +7,13 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 public class ProductsList {
-
-
     private Integer threadNumberDefault = 20;
     private Integer sameNumber = 20;
     private Integer rowLimit = 1000;
     private List<Product> productList = Collections.synchronizedList(new ArrayList<>());
-    // private ExecutorService executors = Executors.newFixedThreadPool(threadNumberDefault);
     private ThreadPoolExecutor executors = new ThreadPoolExecutor(threadNumberDefault, threadNumberDefault,
-                                      0L, TimeUnit.MILLISECONDS,
+                                      10L, TimeUnit.MILLISECONDS,
             new LinkedBlockingQueue<>());
-    // ThreadPoolExecutor threadPoolExecutor =
 
     /** Main method for parsing csv path to List of Products
      * @param csvPath path to csv file or directory with files;
@@ -44,25 +40,23 @@ public class ProductsList {
                     productList.addAll(parser.parseFile(file).getProductList());
 
                      count.getAndSet(count.get() + 1);
-                     System.out.println("read file : " + file.getName() + "["+count+"/"+csvFiles.size()+"]");
+                     System.out.println("read file : " + file.getName() + "["+count.get()+"/"+csvFiles.size()+"]");
                 });
             }
 
-            while (executors.getActiveCount() >0) { }
+            while (executors.getActiveCount() >0) {
+                printProgress(Math.toIntExact(executors.getTaskCount()), executors.getActiveCount());
+            }
             executors.shutdown();
+            executors.shutdownNow();
+            System.out.println("\n Done!");
         }else{
             throw  new Exception("Wrong path");
         }
-
-
-    }
-
-    public ThreadPoolExecutor getExecutors(){
-        return this.executors;
     }
 
     /** Get limited by count and by same count*/
-    public List<Product> getCheapestProducts(Integer rowNumbers){
+    private List<Product> getCheapestProducts(Integer rowNumbers){
 
         List<Product> productListLimited = new ArrayList<>();
 
@@ -80,16 +74,25 @@ public class ProductsList {
                     });
         }catch (RuntimeException ignored){ }
         return productListLimited;
-
     }
 
+    private void printProgress(Integer taskCount, Integer activeTask){
+//        System.out.print("\r process : [");
+//        for(int i =0; i < taskCount - activeTask; i++){
+//            System.out.print( "=" );
+//        }
+//        System.out.print(" ]");
+    }
+
+
+
     /** Get product list by default parameters */
-    public List<Product> getCheapestProducts(){
+    List<Product> getCheapestProducts(){
         return getCheapestProducts(rowLimit);
     }
 
 
-    public void setThreadNumber(Integer threadNumber) {
+    void setThreadNumber(Integer threadNumber) {
         executors = new ThreadPoolExecutor(threadNumber, threadNumber,
                 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
     }
@@ -98,11 +101,9 @@ public class ProductsList {
         this.sameNumber = sameNumber;
     }
 
-    public void setRowLimit(Integer rowLimit){
+    private void setRowLimit(Integer rowLimit){
         this.rowLimit = rowLimit;
     }
-
-
 
     /** simple check about csv files */
     private boolean isCsvFile(File file){
