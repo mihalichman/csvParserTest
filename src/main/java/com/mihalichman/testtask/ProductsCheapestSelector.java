@@ -29,6 +29,7 @@ public class ProductsCheapestSelector {
                 }
                 productsList.parseFileToList(args[0], productsParser);
                 printResult(productsList.getCheapestProducts());
+                productsList.stopTreadPool();
 
             } catch (Exception e) {
                 System.out.println("Error parsing: " + e.getMessage() + "\n try again with right parameters" );

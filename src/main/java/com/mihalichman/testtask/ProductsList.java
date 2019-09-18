@@ -47,8 +47,7 @@ public class ProductsList {
             while (executors.getActiveCount() >0) {
                 printProgress(Math.toIntExact(executors.getTaskCount()), executors.getActiveCount());
             }
-            executors.shutdown();
-            executors.shutdownNow();
+            // executors.shutdown();
             System.out.println("\n Done!");
         }else{
             throw  new Exception("Wrong path");
@@ -84,6 +83,11 @@ public class ProductsList {
 //        System.out.print(" ]");
     }
 
+    public void stopTreadPool(){
+        if (! executors.isShutdown()){
+            executors.shutdownNow();
+        }
+    }
 
 
     /** Get product list by default parameters */
